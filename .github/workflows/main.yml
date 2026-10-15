@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: student-result-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: student-result-app
+  template:
+    metadata:
+      labels:
+        app: student-result-app
+    spec:
+      containers:
+        - name: student-result-container
+          image: student-result-app:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: student-result-service
+spec:
+  selector:
+    app: student-result-app
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
+  type: NodePort
