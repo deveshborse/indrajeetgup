@@ -1,33 +1,31 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: student-result-app
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: student-result-app
-  template:
-    metadata:
-      labels:
-        app: student-result-app
-    spec:
-      containers:
-        - name: student-result-container
-          image: student-result-app:latest
-          imagePullPolicy: IfNotPresent
-          ports:
-            - containerPort: 5000
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: student-result-service
-spec:
-  selector:
-    app: student-result-app
-  ports:
-    - protocol: TCP
-      port: 5000
-      targetPort: 5000
-  type: NodePort
+
+name: Python Flask CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flask
+
+      - name: Check Python syntax
+        run: python -m py_compile app.py
+
+      - name: Verify Flask application
+        run: |
+          python -c "from app import app; print('Flask app loaded successfully')"
